@@ -5,6 +5,7 @@ from typing import Optional, List, Union
 class StudentCreate(BaseModel):
     name: str
     email: str
+    password:str
 
 
 class StudentUpdate(BaseModel):
@@ -24,3 +25,7 @@ class StudentOut(BaseModel):
 class StudentResponse(BaseModel):
     message: str
     data: Union[StudentOut, List[StudentOut]]
+
+class LoginRequest(BaseModel):
+    email:str
+    password:str

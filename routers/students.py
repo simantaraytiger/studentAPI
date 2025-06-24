@@ -20,13 +20,15 @@ def get_db():
 
 @router.post("/", response_model=StudentResponse)
 def create_student(student: StudentCreate, db: Session = Depends(get_db)):
-    new_student = Student(name=student.name, email=student.email)
+    new_student = Student(
+        name=student.name, email=student.email, password=student.password
+    )
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
     return {
         "message": "Student created successfully",
-        "data": jsonable_encoder(new_student)
+        "data": jsonable_encoder(new_student),
     }
 
 
@@ -35,7 +37,7 @@ def get_all_students(db: Session = Depends(get_db)):
     students = db.query(Student).all()
     return {
         "message": "All students retrieved successfully",
-        "data": jsonable_encoder(students)
+        "data": jsonable_encoder(students),
     }
 
 
@@ -46,30 +48,28 @@ def get_student(student_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Student not found")
     return {
         "message": "Student retrieved successfully",
-        "data": jsonable_encoder(student)
+        "data": jsonable_encoder(student),
     }
 
 
 @router.put("/{student_id}", response_model=StudentResponse)
 def update_student(
-    student_id: int,
-    student_data: StudentUpdate,
-    db: Session = Depends(get_db)
+    student_id: int, student_data: StudentUpdate, db: Session = Depends(get_db)
 ):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
     if student_data.name is not None:
-        student.name = student_data.name # type: ignore
+        student.name = student_data.name  # type: ignore
     if student_data.email is not None:
-        student.email = student_data.email # type: ignore
+        student.email = student_data.email  # type: ignore
 
     db.commit()
     db.refresh(student)
     return {
         "message": "Student updated successfully",
-        "data": jsonable_encoder(student)
+        "data": jsonable_encoder(student),
     }
 
 
@@ -81,7 +81,4 @@ def delete_student(student_id: int, db: Session = Depends(get_db)):
 
     db.delete(student)
     db.commit()
-    return {
-        "message": "Student deleted successfully",
-        "data": {}
-    }
+    return {"message": "Student deleted successfully", "data": {}}
