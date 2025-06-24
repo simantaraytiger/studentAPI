@@ -1,3 +1,4 @@
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
@@ -18,7 +19,7 @@ def student_login(stuendLoginReq: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Student not found")
     studentData = jsonable_encoder(student)
 
-    if studentData["password"] != stuendLoginReq.password:
+    if not bcrypt.checkpw(stuendLoginReq.password.encode("utf-8"), student.password.encode("utf-8")):
         raise HTTPException(status_code=404, detail="Password Worng")
     token = gen_jwt({"user": studentData["email"]})
     return {

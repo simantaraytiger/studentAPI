@@ -75,12 +75,13 @@ def update_student(
     }
 
 
-@router.delete("/{student_id}", response_model=StudentResponse)
+@router.delete("/{student_id}")
 def delete_student(student_id: int, db: Session = Depends(get_db)):
+    print(student_id)
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
     db.delete(student)
     db.commit()
-    return {"message": "Student deleted successfully", "data": {}}
+    return {"message": "Student deleted successfully"}
