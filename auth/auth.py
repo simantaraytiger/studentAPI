@@ -18,10 +18,10 @@ def student_login(stuendLoginReq: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Student not found")
     studentData = jsonable_encoder(student)
 
-    if studentData.password != stuendLoginReq.password:
+    if studentData["password"] != stuendLoginReq.password:
         raise HTTPException(status_code=404, detail="Password Worng")
-    token = gen_jwt({"sub": student.email})
+    token = gen_jwt({"user": studentData["email"]})
     return {
-        "message": "All students retrieved successfully",
+        "message": "Login successful",
         "token": jsonable_encoder(token),
     }
