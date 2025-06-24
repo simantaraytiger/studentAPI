@@ -1,3 +1,4 @@
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
@@ -20,8 +21,9 @@ def get_db():
 
 @router.post("/", response_model=StudentResponse)
 def create_student(student: StudentCreate, db: Session = Depends(get_db)):
+    hashed_password = bcrypt.hashpw(student.password.encode("utf-8"), bcrypt.gensalt())
     new_student = Student(
-        name=student.name, email=student.email, password=student.password
+        name=student.name, email=student.email, password=hashed_password.decode("utf-8")
     )
     db.add(new_student)
     db.commit()
