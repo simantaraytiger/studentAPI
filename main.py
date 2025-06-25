@@ -1,16 +1,22 @@
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
+from contextlib import asynccontextmanager
 from auth import auth
 from auth.jwt_utils import gen_jwt, jwt_checker
 from db import engine
 from models import Base
 from routers import students
 
-app = FastAPI()
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
-# # Register router
+
+app = FastAPI(lifespan=lifespan)
+
+# Register routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(students.router, prefix="/students", tags=["students"])
 
@@ -23,4 +29,4 @@ def get_jwt_token():
 
 @app.get("/", dependencies=[Depends(jwt_checker)])
 def get():
-    return {"data": "Api working"}
+    return {"data": "API working"}
