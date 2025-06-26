@@ -1,10 +1,9 @@
-from fastapi import Depends, FastAPI
+from backend.auth import auth
+from backend.auth.jwt_utils import gen_jwt, jwt_checker
+from backend.routers import products, students
+from backend.db import Base, engine
 from contextlib import asynccontextmanager
-from auth import auth
-from auth.jwt_utils import gen_jwt, jwt_checker
-from db import engine
-from models import Base
-from routers import students
+from fastapi import Depends, FastAPI
 
 
 @asynccontextmanager
@@ -19,6 +18,7 @@ app = FastAPI(lifespan=lifespan)
 # Register routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(students.router, prefix="/students", tags=["students"])
+app.include_router(products.router, prefix="/product", tags=["products"])
 
 
 @app.get("/gen-jwt")
