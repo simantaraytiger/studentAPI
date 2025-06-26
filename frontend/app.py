@@ -18,7 +18,7 @@ def fetch_products():
 products = fetch_products()
 
 # List all products
-st.subheader("📦 All Products")
+st.subheader("Products")
 
 if products:
     for product in products:
