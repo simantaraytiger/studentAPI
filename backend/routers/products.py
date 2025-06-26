@@ -10,18 +10,18 @@ router = APIRouter()
 
 
 @router.post("/", response_model=ProductResponse)
-async def create_product(product: ProductCreate, db: AsyncSession = Depends(get_async_db)):
+async def create_product(
+    product: ProductCreate, db: AsyncSession = Depends(get_async_db)
+):
     new_product = Product(
-        name=product.name,
-        price=product.price,
-        description=product.description
+        name=product.name, price=product.price, description=product.description
     )
     db.add(new_product)
     await db.commit()
     await db.refresh(new_product)
     return {
         "message": "Product created successfully",
-        "data": jsonable_encoder(new_product)
+        "data": jsonable_encoder(new_product),
     }
 
 
@@ -31,7 +31,7 @@ async def get_all_products(db: AsyncSession = Depends(get_async_db)):
     products = result.scalars().all()
     return {
         "message": "All products retrieved successfully",
-        "data": jsonable_encoder(products)
+        "data": jsonable_encoder(products),
     }
 
 
@@ -43,12 +43,16 @@ async def get_product(product_id: int, db: AsyncSession = Depends(get_async_db))
         raise HTTPException(status_code=404, detail="Product not found")
     return {
         "message": "Product retrieved successfully",
-        "data": jsonable_encoder(product)
+        "data": jsonable_encoder(product),
     }
 
 
 @router.put("/{product_id}", response_model=ProductResponse)
-async def update_product(product_id: int, product_data: ProductUpdate, db: AsyncSession = Depends(get_async_db)):
+async def update_product(
+    product_id: int,
+    product_data: ProductUpdate,
+    db: AsyncSession = Depends(get_async_db),
+):
     result = await db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
     if not product:
@@ -65,7 +69,7 @@ async def update_product(product_id: int, product_data: ProductUpdate, db: Async
     await db.refresh(product)
     return {
         "message": "Product updated successfully",
-        "data": jsonable_encoder(product)
+        "data": jsonable_encoder(product),
     }
 
 
@@ -80,5 +84,5 @@ async def delete_product(product_id: int, db: AsyncSession = Depends(get_async_d
     await db.commit()
     return {
         "message": "Product deleted successfully",
-        "data": jsonable_encoder(product)
+        "data": jsonable_encoder(product),
     }

@@ -63,9 +63,9 @@ async def update_student(
         raise HTTPException(status_code=404, detail="Student not found")
 
     if student_data.name is not None:
-        student.name = student_data.name # type: ignore
+        student.name = student_data.name  # type: ignore
     if student_data.email is not None:
-        student.email = student_data.email # type: ignore
+        student.email = student_data.email  # type: ignore
 
     await db.commit()
     await db.refresh(student)
