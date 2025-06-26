@@ -6,6 +6,7 @@ API_URL = "http://localhost:8000"
 
 st.title("Product Managemen")
 
+
 # Fetch products
 def fetch_products():
     try:
@@ -15,7 +16,25 @@ def fetch_products():
     except Exception:
         return []
 
-products = fetch_products()
+
+all_products = fetch_products()
+
+# Sidebar filter
+st.sidebar.header("Filter")
+if all_products:
+    prices = [p["price"] for p in all_products]
+    min_price, max_price = st.sidebar.slider(
+        "Select price range:",
+        min_value=float(min(prices)) - 10,
+        max_value=float(max(prices)) + 10,
+        value=(float(min(prices)), float(max(prices))),
+        step=.5,
+    )
+else:
+    min_price, max_price = (0.0, 0.0)
+
+# Apply filter
+products = [p for p in all_products if min_price <= p["price"] <= max_price]  # type: ignore
 
 # List all products
 st.subheader("Products")
@@ -50,13 +69,19 @@ st.subheader("Edit Product")
 if "edit_id" in st.session_state:
     with st.form("edit_product_form"):
         name = st.text_input("Product Name", value=st.session_state.edit_name)
-        price = st.number_input("Price", value=st.session_state.edit_price, min_value=0.0)
-        description = st.text_input("Description", value=st.session_state.edit_description)
+        price = st.number_input(
+            "Price", value=st.session_state.edit_price, min_value=0.0
+        )
+        description = st.text_input(
+            "Description", value=st.session_state.edit_description
+        )
         submitted = st.form_submit_button("Update")
 
         if submitted:
             payload = {"name": name, "price": price, "description": description}
-            res = requests.put(f"{API_URL}/product/{st.session_state.edit_id}", json=payload)
+            res = requests.put(
+                f"{API_URL}/product/{st.session_state.edit_id}", json=payload
+            )
             if res.status_code == 200:
                 st.success("Product updated!")
                 st.cache_data.clear()
@@ -70,7 +95,7 @@ else:
 # Add new product
 st.subheader("Add New Product")
 with st.form("add_product"):
-    name = st.text_input("Name")
+    name = st.text_input("Product Name")
     price = st.number_input("Price", min_value=0.0)
     description = st.text_input("Description")
     submitted = st.form_submit_button("Add Product")
