@@ -1,12 +1,13 @@
 import bcrypt
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException
 
-from db import get_async_db
-from models import Student
-from schemas import StudentCreate, StudentUpdate, StudentResponse
+from backend.db import get_async_db
+from backend.models import Student
+from backend.schemas import StudentCreate, StudentResponse, StudentUpdate
+
 
 router = APIRouter()
 

@@ -1,14 +1,15 @@
 import bcrypt
-from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
-from auth.jwt_utils import gen_jwt
-from db import get_async_db
-from models import Student
-from schemas import LoginRequest, StudentCreate, StudentResponse
-from functools import lru_cache
+from fastapi import APIRouter, Depends, HTTPException
+
+from backend.auth.jwt_utils import gen_jwt
+from backend.db import get_async_db
+from backend.models import Student
+from backend.schemas import LoginRequest, StudentCreate, StudentResponse
+
 
 router = APIRouter()
 
