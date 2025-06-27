@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+import math
 
 API_URL = "http://localhost:8000"
 
@@ -38,9 +39,24 @@ products = [p for p in all_products if min_price <= p["price"] <= max_price]  # 
 
 # List all products
 st.subheader("Products")
+PAGE_SIZE = 5
+total_products = len(products)
+total_pages = math.ceil(total_products / PAGE_SIZE)
 
-if products:
-    for product in products:
+# Initialize current page in session state
+if "product_page" not in st.session_state:
+    st.session_state.product_page = 1
+
+st.caption(f"Page {st.session_state.product_page} of {total_pages}")
+
+# Get products for current page
+start = (st.session_state.product_page - 1) * PAGE_SIZE
+end = start + PAGE_SIZE
+current_products = products[start:end]
+
+# Display paginated products
+if current_products:
+    for product in current_products:
         cols = st.columns([1, 3, 2, 3, 2, 2])
         cols[0].markdown(f"**ID:** {product['id']}")
         cols[1].markdown(f"**Name:** {product['name']}")
@@ -62,7 +78,16 @@ if products:
             else:
                 st.error("Delete failed")
 else:
-    st.warning("No products found or API error.")
+    st.warning("No products in selected price range or page is empty.")
+
+prev_col, next_col = st.columns([1, 1])
+with prev_col:
+    if st.button("Prev", disabled=st.session_state.product_page <= 1):
+        st.session_state.product_page -= 1
+with next_col:
+    if st.button("Next", disabled=st.session_state.product_page > total_pages):
+        st.session_state.product_page += 1
+
 
 # Edit product
 st.subheader("Edit Product")
