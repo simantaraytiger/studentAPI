@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import math
+import altair as alt
 
 API_URL = "http://localhost:8000"
 
@@ -135,10 +136,19 @@ with st.form("add_product"):
         else:
             st.error("Failed to add product")
 
-# Show product price chart
-st.subheader("Price Chart")
+st.subheader("📊 Interactive Price Chart")
 if products:
-    df = pd.DataFrame(products)
-    st.bar_chart(df.set_index("name")["price"])
+    df_chart = pd.DataFrame(products)
+    chart = (
+        alt.Chart(df_chart)
+        .mark_bar()
+        .encode(
+            x=alt.X("name:N", title="Product Name"),
+            y=alt.Y("price:Q", title="Price (₹)"),
+            tooltip=["name", "price", "description"]
+        )
+        .interactive()
+    )
+    st.altair_chart(chart, use_container_width=True)
 else:
     st.info("No products to show in chart.")

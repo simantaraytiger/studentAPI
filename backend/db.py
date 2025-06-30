@@ -4,14 +4,12 @@ from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = "sqlite+aiosqlite:///./database.db"
 
-# Create async engine
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,  # Optional: Logs SQL queries to console
+    echo=True,
     future=True,
 )
 
-# Create sessionmaker using AsyncSession
 AsyncSessionLocal = sessionmaker(
     bind=engine, # type: ignore
     class_=AsyncSession,
@@ -20,10 +18,8 @@ AsyncSessionLocal = sessionmaker(
     autocommit=False,
 ) # type: ignore
 
-# Base class for ORM models
 Base = declarative_base()
 
-# Dependency for FastAPI routes
 async def get_async_db():
     async with AsyncSessionLocal() as session: # type: ignore
         try:
